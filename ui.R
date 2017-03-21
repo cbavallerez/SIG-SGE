@@ -1,0 +1,83 @@
+library(shiny)
+library(DBI)
+library(shinydashboard)
+library(leaflet)
+
+
+header <- dashboardHeader(title = "BrillanteSegregacion")
+  
+sidebar <- dashboardSidebar(
+  
+   fluidPage(
+    sidebarMenu(
+
+      menuItem("Mapa", tabName = "mapa"),
+      menuItem("Tabla", tabName = "tabla")
+      
+    ),
+    selectInput("AGNO", label = h4("AÑO"), 
+                
+                choices = c("2015" = 2015,
+                            "2014" = 2014),
+                selected = 2015
+    ),
+    selectInput("txtregion", label = h4("Seleccionar Region"), 
+                
+                choices = c("Región de Tarapacá"=  1,
+                            "Región de Antofagasta"= 2,
+                            "Región de Atacama" = 3,
+                            "Región de Coquimbo" = 4,
+                            "Región de Valparaíso" = 5,
+                            "Región del Libertador Gral. Bernardo O’Higgins" = 6,
+                            "Región del Maule" = 7,
+                            "Región del Biobío" = 8,
+                            "Región de la Araucanía" = 9,
+                            "Región de Aysén del Gral. Carlos Ibáñez del Campo"= 10,
+                            "Región de Magallanes y de la Antártica Chilena"= 11,
+                            "Región de Metropolitana de Santiago"= 12,
+                            "Región de Los Ríos"= 13,
+                            "Región de Tarapacá" =14,
+                            "Región de Arica y Parinacota" = 15), 
+                selected = 9
+    ),
+    uiOutput("seleccionar_comuna"),
+    
+    uiOutput("inputRBD"),
+    
+    uiOutput("establecimiento_datos")
+    
+   )
+  )
+body <- dashboardBody(
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "css/style.css"),
+    tags$script(src="js/leaflet.js"),
+    tags$script(src="js/stabsel.js")
+    
+  ),
+    tabItems(
+      tabItem("mapa",
+              
+              leafletOutput("mimapa", width="100%",height="800px")
+              ),
+      tabItem("tabla",
+
+             
+              dataTableOutput('DatosEstablecimiento')
+
+                
+              
+              
+      )
+      
+    )
+    
+  )
+  
+shinyUI(
+dashboardPage(
+  header,
+  sidebar,
+  body
+)
+)
