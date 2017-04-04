@@ -30,13 +30,13 @@ comunas <- function(txtregion) {
 
 
 shinyServer(function(input, output) {
-
+  
   
   #En la siguiente salida se envia a la UI.R un input del tipo numerico que servira pa seleecionar un establecimiento 
   output$inputRBD = renderUI({
     numericInput("establecimiento_seleccionado", "RBD:",  5666)
   })
-
+  
   
   
   output$establecimiento_datos = renderUI({
@@ -55,7 +55,7 @@ shinyServer(function(input, output) {
       tags$p("Indice Seg: ",matricula_establecimiento(RBD_establecimiento_seleccionado))
       
       
-
+      
     )
   })
   #En la siguiente salida se crea un select para las comunas
@@ -81,14 +81,14 @@ shinyServer(function(input, output) {
     my_query <- 'SELECT NOM_RBD, LATITUD, LONGITUD, COD_COM_RBD, NOM_COM_RBD FROM ESTABLECIMIENTOS WHERE AGNO = 2015 AND RBD = RBD_SELECCIONADO'
     my_query <- sub("RBD_SELECCIONADO",RBD_establecimiento_seleccionado,my_query)
     ubicacion <- dbGetQuery(conn,my_query)
-  
-     }
+    
+  }
   
   #Esta funciona recibe el RBD del establecimiento para almacenar el conteo de alumnos inscritos en ese establecimiento   
   
   matricula_establecimiento <- function(RBD_establecimiento_seleccionado) {
     conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
-
+    
     my_query <- 'SELECT count(*) FROM ALUMNOS WHERE AGNO = AÑO_SELECCIONADO AND RBD = RBD_SELECCIONADO'
     my_query <- sub("AÑO_SELECCIONADO",input$AGNO,my_query)
     my_query <- sub("RBD_SELECCIONADO",RBD_establecimiento_seleccionado,my_query)
@@ -127,7 +127,7 @@ shinyServer(function(input, output) {
     
     
     
-  
+    
     #   Se cargan los establecimientos de la region seleccionada
     ubicacion_RBD <- as.character(ubicacion_establecimiento(input$txtregion)$RBD)
     
@@ -139,16 +139,16 @@ shinyServer(function(input, output) {
     
   })
   observe({
-
+    
     txtregion <-input$txtregion
     
-
+    
     leafletProxy("mimapa", data = ubicacion_establecimiento(txtregion)) %>%
       clearShapes() %>%
       addCircleMarkers(lat =  ~LATITUD, lng =  ~LONGITUD, weight = 6, radius = 3,color="#ffa500", stroke = TRUE, fillOpacity = 0.8, layerId = ~RBD
       )
   })
-
+  
   observeEvent(input$mimapa_marker_click, { # update the map markers and view on map clicks
     p <- input$mimapa_marker_click
     proxy <- leafletProxy("mimapa")
@@ -190,12 +190,12 @@ shinyServer(function(input, output) {
     )
   
   
-
+  
   
   
   
   
   
   ################################# FIN MAPA #########################################################
-
+  
 })

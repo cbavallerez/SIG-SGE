@@ -1,0 +1,44 @@
+From f1d171a38da15ab560a79298964005808486c45c Mon Sep 17 00:00:00 2001
+From: (null) <PëF:	V>
+Date: Tue, 4 Apr 2017 03:46:31 -0300
+Subject: [PATCH] El seleccionador de comunas funciona mostrando las comunas de la region seleccionada y autoseleccionando la comuna del establecimiento seleccionado
+
+---
+ server.R | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/server.R b/server.R
+index 2a1096d..dda9ed5 100644
+--- a/server.R
++++ b/server.R
+@@ -36,12 +36,7 @@ shinyServer(function(input, output) {
+   output$inputRBD = renderUI({
+     numericInput("establecimiento_seleccionado", "RBD:",  5666)
+   })
+-  #En la siguiente salida se crea un select para las comunas
+-  output$seleccionar_comuna = renderUI({
+-    choicesComunas <- setNames(as.character(comunas(input$txtregion)$COD_COMUNA), comunas(input$txtregion)$NOM_COM)
+-    selectInput("txtcomuna", label = h4("Seleccionar Comuna"), choices = choicesComunas
+-                )
+-  })
++
+   
+   
+   output$establecimiento_datos = renderUI({
+@@ -63,6 +58,13 @@ shinyServer(function(input, output) {
+ 
+     )
+   })
++  #En la siguiente salida se crea un select para las comunas
++  output$seleccionar_comuna = renderUI({
++    RBD_establecimiento_seleccionado <- as.numeric(input$establecimiento_seleccionado) 
++    choicesComunas <- setNames(as.character(comunas(input$txtregion)$COD_COMUNA), comunas(input$txtregion)$NOM_COM)
++    selectInput("txtcomuna", label = h4("Seleccionar Comuna"), choices = choicesComunas, selected = as.numeric(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD) 
++    )
++  })
+   
+   #Envia informacion sobre los establecimientos a una tabla 
+   output$DatosEstablecimiento = renderDataTable({
+--
+libgit2 0.24.3
+
