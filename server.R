@@ -36,12 +36,7 @@ shinyServer(function(input, output) {
   output$inputRBD = renderUI({
     numericInput("establecimiento_seleccionado", "RBD:",  5666)
   })
-  #En la siguiente salida se crea un select para las comunas
-  output$seleccionar_comuna = renderUI({
-    choicesComunas <- setNames(as.character(comunas(input$txtregion)$COD_COMUNA), comunas(input$txtregion)$NOM_COM)
-    selectInput("txtcomuna", label = h4("Seleccionar Comuna"), choices = choicesComunas
-                )
-  })
+
   
   
   output$establecimiento_datos = renderUI({
@@ -61,6 +56,13 @@ shinyServer(function(input, output) {
       
       
 
+    )
+  })
+  #En la siguiente salida se crea un select para las comunas
+  output$seleccionar_comuna = renderUI({
+    RBD_establecimiento_seleccionado <- as.numeric(input$establecimiento_seleccionado) 
+    choicesComunas <- setNames(as.character(comunas(input$txtregion)$COD_COMUNA), comunas(input$txtregion)$NOM_COM)
+    selectInput("txtcomuna", label = h4("Seleccionar Comuna"), choices = choicesComunas, selected = as.numeric(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD) 
     )
   })
   
