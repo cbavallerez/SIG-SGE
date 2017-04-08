@@ -6,10 +6,8 @@ library(rgdal)
 library(dbConnect)
 #la funcion ubicacion establecimiento recibe como parametro txtregion que ...
 #contiene le numero de region seleccionado por el input regiones
+conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
 ubicacion_establecimiento <- function(txtregion) {
-  on.exit(dbDisconnect(conn))
-  
-  conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
   
   #la consulta extra el RBD, Langitud y latitud de todos los establecimientos de la region 
   my_query <- 'SELECT RBD, LATITUD, LONGITUD FROM ESTABLECIMIENTOS WHERE COD_REG_RBD = TXTREGION'
@@ -18,10 +16,6 @@ ubicacion_establecimiento <- function(txtregion) {
 }
 
 comunas <- function(txtregion) {
-  on.exit(dbDisconnect(conn))
-  
-  conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
-  
   #la consulta extra el RBD, Langitud y latitud de todos los establecimientos de la region 
   my_query <- 'SELECT NOM_COM, COD_COMUNA FROM COMUNAS WHERE COD_REG = TXTREGION'
   my_query <- sub("TXTREGION",txtregion,my_query)
@@ -30,6 +24,7 @@ comunas <- function(txtregion) {
 
 
 shinyServer(function(input, output) {
+  #conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
   
   
   #En la siguiente salida se envia a la UI.R un input del tipo numerico que servira pa seleecionar un establecimiento 
@@ -64,23 +59,26 @@ shinyServer(function(input, output) {
     choicesComunas <- setNames(as.character(comunas(input$txtregion)$COD_COMUNA), comunas(input$txtregion)$NOM_COM)
     selectInput("txtcomuna", label = h4("Seleccionar Comuna"), choices = choicesComunas, selected = as.numeric(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD) 
     )
+    
+
   })
   
   #Envia informacion sobre los establecimientos a una tabla 
   output$DatosEstablecimiento = renderDataTable({
-    ubicacion_establecimiento(input$txtregion)
+    #ubicacion_establecimiento(input$txtregion)
   })
   
   
   
   #Toma informacion del establecimiento seleccionado en el input RBD
   establecimiento_seleccionado <- function(RBD_establecimiento_seleccionado) {
-    
+    RBD_establecimiento_seleccionado <- as.numeric(input$establecimiento_seleccionado) 
     conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
     
     my_query <- 'SELECT NOM_RBD, LATITUD, LONGITUD, COD_COM_RBD, NOM_COM_RBD FROM ESTABLECIMIENTOS WHERE AGNO = 2015 AND RBD = RBD_SELECCIONADO'
     my_query <- sub("RBD_SELECCIONADO",RBD_establecimiento_seleccionado,my_query)
     ubicacion <- dbGetQuery(conn,my_query)
+    #dbDisconnect(conn)
     
   }
   
@@ -93,6 +91,8 @@ shinyServer(function(input, output) {
     my_query <- sub("AÑO_SELECCIONADO",input$AGNO,my_query)
     my_query <- sub("RBD_SELECCIONADO",RBD_establecimiento_seleccionado,my_query)
     matricula <- dbGetQuery(conn,my_query)
+    #dbDisconnect(conn)
+    
   }
   
   #Esta funcion Recibe el RBD del establecimiento y almacena el conteo de alumnos vulnerables  
@@ -103,6 +103,8 @@ shinyServer(function(input, output) {
     my_query <- sub("AÑO_SELECCIONADO",input$AGNO,my_query)
     my_query <- sub("RBD_SELECCIONADO",RBD_establecimiento_seleccionado,my_query)
     ubicacion <- dbGetQuery(conn,my_query)
+    #dbDisconnect(conn)
+    
   }
   
   
@@ -128,6 +130,7 @@ shinyServer(function(input, output) {
     
     
     
+    
     #   Se cargan los establecimientos de la region seleccionada
     ubicacion_RBD <- as.character(ubicacion_establecimiento(input$txtregion)$RBD)
     
@@ -135,7 +138,6 @@ shinyServer(function(input, output) {
     
     #Se carga la funcion leaflet con el argumento
     leaflet() %>% addTiles()%>%setView(lng = posicionregion$LONGITUD, lat = posicionregion$LATITUD, zoom = 8)
-    
     
   })
   observe({
@@ -163,19 +165,7 @@ shinyServer(function(input, output) {
     }
   })
   
-  observeEvent(input$mimapa_marker_click, { # update the map markers and view on map clicks
-    p <- input$seleccionar_comuna
-    proxy <- leafletProxy("mimapa")
-    if(p$id=="Selected"){
-      proxy %>% removeMarker(layerId="Selected")
-    } else {
-      proxy %>% setView(lng=p$lng, lat=p$lat, 15)
-      output$inputRBD = renderUI({
-        numericInput("establecimiento_seleccionado", "RBD:", p$id  )
-      })
-      
-    }
-  })
+
   
   states <- readOGR("www/division_comunal/division_comunal.shp",
                     layer = "division_comunal", GDAL1_integer64_policy = TRUE)
