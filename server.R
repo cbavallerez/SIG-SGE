@@ -6,7 +6,7 @@ library(rgdal)
 library(dbConnect)
 #la funcion ubicacion establecimiento recibe como parametro txtregion que ...
 #contiene le numero de region seleccionado por el input regiones
-conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
+conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
 ubicacion_establecimiento <- function(txtregion) {
   
   #la consulta extra el RBD, Langitud y latitud de todos los establecimientos de la region 
@@ -24,7 +24,7 @@ comunas <- function(txtregion) {
 
 
 shinyServer(function(input, output) {
-  #conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
+  conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
   
   
   #En la siguiente salida se envia a la UI.R un input del tipo numerico que servira pa seleecionar un establecimiento 
@@ -60,7 +60,7 @@ shinyServer(function(input, output) {
     selectInput("txtcomuna", label = h4("Seleccionar Comuna"), choices = choicesComunas, selected = as.numeric(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD) 
     )
     
-
+    
   })
   
   #Envia informacion sobre los establecimientos a una tabla 
@@ -73,7 +73,7 @@ shinyServer(function(input, output) {
   #Toma informacion del establecimiento seleccionado en el input RBD
   establecimiento_seleccionado <- function(RBD_establecimiento_seleccionado) {
     RBD_establecimiento_seleccionado <- as.numeric(input$establecimiento_seleccionado) 
-    conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
+    conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
     
     my_query <- 'SELECT NOM_RBD, LATITUD, LONGITUD, COD_COM_RBD, NOM_COM_RBD FROM ESTABLECIMIENTOS WHERE AGNO = 2015 AND RBD = RBD_SELECCIONADO'
     my_query <- sub("RBD_SELECCIONADO",RBD_establecimiento_seleccionado,my_query)
@@ -85,7 +85,7 @@ shinyServer(function(input, output) {
   #Esta funciona recibe el RBD del establecimiento para almacenar el conteo de alumnos inscritos en ese establecimiento   
   
   matricula_establecimiento <- function(RBD_establecimiento_seleccionado) {
-    conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
+    conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
     
     my_query <- 'SELECT count(*) FROM ALUMNOS WHERE AGNO = AÑO_SELECCIONADO AND RBD = RBD_SELECCIONADO'
     my_query <- sub("AÑO_SELECCIONADO",input$AGNO,my_query)
@@ -97,7 +97,7 @@ shinyServer(function(input, output) {
   
   #Esta funcion Recibe el RBD del establecimiento y almacena el conteo de alumnos vulnerables  
   sep_establecimiento <- function(RBD_establecimiento_seleccionado) {
-    conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
+    conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
     on.exit(DBI::dbDisconnect(conn))
     my_query <- 'SELECT count(*) FROM ALUMNOS_SEP WHERE AGNO = AÑO_SELECCIONADO AND RBD = RBD_SELECCIONADO'
     my_query <- sub("AÑO_SELECCIONADO",input$AGNO,my_query)
@@ -119,7 +119,7 @@ shinyServer(function(input, output) {
     
     
     #Se inicia la conexion con la base de datos
-    conn <- dbConnect(MySQL(), user="SIG-SGE", host="127.0.0.1", password="Si-7FNobafwSulPVGT", dbname="mydb")
+    conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
     
     #la consulta extrae contiene la longitud y latitud de la region seleccionada en el input$txtregion
     query_posicionregion <- 'SELECT LONGITUD, LATITUD FROM `REGIONES` WHERE `ID` = TXTREGION'
@@ -165,7 +165,7 @@ shinyServer(function(input, output) {
     }
   })
   
-
+  
   
   states <- readOGR("www/division_comunal/division_comunal.shp",
                     layer = "division_comunal", GDAL1_integer64_policy = TRUE)

@@ -3,6 +3,9 @@ title:
 account: cbavallerez
 server: shinyapps.io
 appId: 166060
-bundleId: 758632
+bundleId: 802818
 url: https://cbavallerez.shinyapps.io/sig-sge/
-when: 1490219494.88628
+when: 1493115884.76726
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: 0001-El-seleccionador-de-comunas-funciona-mostrando-las-comunas-de-la-region-seleccionada-y-autoseleccionando-la-comuna-del-establecimiento-seleccionado.patch|apuntes.R|README.md
