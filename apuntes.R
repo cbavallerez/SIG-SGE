@@ -109,3 +109,37 @@ tabItem("tabla",
 ##############apunte
 #S soluciono dando como typo foat a los cmapos longid y lattud
 
+
+###############
+interfaz 
+
+box(width = NULL, status = "warning",
+    uiOutput("routeSelect"),
+    checkboxGroupInput("directions", "Show",
+                       choices = c(
+                         Northbound = 4,
+                         Southbound = 1,
+                         Eastbound = 2,
+                         Westbound = 3
+                       )
+    )
+)
+
+
+tabItems(
+  tabItem("mapa",
+          
+          leafletOutput("mimapa", width="100%",height="800px")
+  ),
+  tabItem("tabla",
+          
+          
+          dataTableOutput('DatosEstablecimiento')
+          
+          
+          
+          
+  )
+  
+)
+
