@@ -77,16 +77,13 @@ body <- dashboardBody(
     ),
     column(width = 3,
            box(width = NULL, status = "warning",
-               uiOutput("routeSelect"),
-               checkboxGroupInput("directions", "Show",
-                                  choices = c(
-                                    Northbound = 4,
-                                    Southbound = 1,
-                                    Eastbound = 2,
-                                    Westbound = 3
-                                  )
-               )
+               checkboxInput("estab_for_region", "Ver establecimientos por región", FALSE),
+               verbatimTextOutput("salida_estab_for_region")
+               ,
+               checkboxInput("ver_shapefile", "Ver division comunal", FALSE),
+               verbatimTextOutput("salida_ver_shapefile")
            )
+
       
     )
   )

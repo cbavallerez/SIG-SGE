@@ -8,6 +8,8 @@ ubicacion_establecimiento <- function(txtregion) {
   
 }
 
+
+
 #Envia informacion sobre los establecimientos a una tabla debajo del mapa
 output$DatosEstablecimiento = renderDataTable({
   txtregion = input$txtregion

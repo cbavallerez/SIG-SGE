@@ -34,6 +34,9 @@ shinyServer(function(input, output) {
   })
   
   
+  output$salida_estab_for_region <- renderText({ input$estab_for_region })
+  output$salida_ver_shapefile <- renderText({ input$ver_shapefile })
+  
   
   output$establecimiento_datos = renderUI({
     
