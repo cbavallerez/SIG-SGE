@@ -4,9 +4,10 @@ library(DBI)
 library(htmltools)
 library(rgdal)
 library(dbConnect)
+MySQL(max.con=100, fetch.default.rec=1000)
 #la funcion ubicacion establecimiento recibe como parametro txtregion que ...
 #contiene le numero de region seleccionado por el input regiones
-conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
+conn <- dbConnect(MySQL(), user="root", host="localhost", password="03121991-0oK", dbname="mydb", port=3306)
 ubicacion_establecimiento <- function(txtregion) {
   
   #la consulta extra el RBD, Langitud y latitud de todos los establecimientos de la region 
@@ -24,7 +25,7 @@ comunas <- function(txtregion) {
 
 
 shinyServer(function(input, output) {
-  conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
+  conn <- dbConnect(MySQL(), user="root", host="localhost", password="03121991-0oK", dbname="mydb", port=3306)
   
   
   #En la siguiente salida se envia a la UI.R un input del tipo numerico que servira pa seleecionar un establecimiento 
@@ -73,37 +74,37 @@ shinyServer(function(input, output) {
   #Toma informacion del establecimiento seleccionado en el input RBD
   establecimiento_seleccionado <- function(RBD_establecimiento_seleccionado) {
     RBD_establecimiento_seleccionado <- as.numeric(input$establecimiento_seleccionado) 
-    conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
+    conn <- dbConnect(MySQL(), user="root", host="localhost", password="03121991-0oK", dbname="mydb", port=3306)
     
     my_query <- 'SELECT NOM_RBD, LATITUD, LONGITUD, COD_COM_RBD, NOM_COM_RBD FROM ESTABLECIMIENTOS WHERE AGNO = 2015 AND RBD = RBD_SELECCIONADO'
     my_query <- sub("RBD_SELECCIONADO",RBD_establecimiento_seleccionado,my_query)
     ubicacion <- dbGetQuery(conn,my_query)
-    #dbDisconnect(conn)
+    #cons<-dbListConnections(MySQL()) for(con in cons) dbDisconnect(con)
     
   }
   
   #Esta funciona recibe el RBD del establecimiento para almacenar el conteo de alumnos inscritos en ese establecimiento   
   
   matricula_establecimiento <- function(RBD_establecimiento_seleccionado) {
-    conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
+    conn <- dbConnect(MySQL(), user="root", host="localhost", password="03121991-0oK", dbname="mydb", port=3306)
     
     my_query <- 'SELECT count(*) FROM ALUMNOS WHERE AGNO = AÑO_SELECCIONADO AND RBD = RBD_SELECCIONADO'
     my_query <- sub("AÑO_SELECCIONADO",input$AGNO,my_query)
     my_query <- sub("RBD_SELECCIONADO",RBD_establecimiento_seleccionado,my_query)
     matricula <- dbGetQuery(conn,my_query)
-    #dbDisconnect(conn)
+    #cons<-dbListConnections(MySQL()) for(con in cons) dbDisconnect(con)
     
   }
   
   #Esta funcion Recibe el RBD del establecimiento y almacena el conteo de alumnos vulnerables  
   sep_establecimiento <- function(RBD_establecimiento_seleccionado) {
-    conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
+    conn <- dbConnect(MySQL(), user="root", host="localhost", password="03121991-0oK", dbname="mydb", port=3306)
     on.exit(DBI::dbDisconnect(conn))
     my_query <- 'SELECT count(*) FROM ALUMNOS_SEP WHERE AGNO = AÑO_SELECCIONADO AND RBD = RBD_SELECCIONADO'
     my_query <- sub("AÑO_SELECCIONADO",input$AGNO,my_query)
     my_query <- sub("RBD_SELECCIONADO",RBD_establecimiento_seleccionado,my_query)
     ubicacion <- dbGetQuery(conn,my_query)
-    #dbDisconnect(conn)
+    #cons<-dbListConnections(MySQL()) for(con in cons) dbDisconnect(con)
     
   }
   
@@ -119,7 +120,7 @@ shinyServer(function(input, output) {
     
     
     #Se inicia la conexion con la base de datos
-    conn <- dbConnect(MySQL(), user="svallejos", host="newton.inf.uct.cl", password="svallejos123", dbname="svallejos", port=3308)
+    conn <- dbConnect(MySQL(), user="root", host="localhost", password="03121991-0oK", dbname="mydb", port=3306)
     
     #la consulta extrae contiene la longitud y latitud de la region seleccionada en el input$txtregion
     query_posicionregion <- 'SELECT LONGITUD, LATITUD FROM `REGIONES` WHERE `ID` = TXTREGION'
@@ -138,7 +139,7 @@ shinyServer(function(input, output) {
     
     #Se carga la funcion leaflet con el argumento
     leaflet() %>% addTiles()%>%setView(lng = posicionregion$LONGITUD, lat = posicionregion$LATITUD, zoom = 8)
-    
+    #cons<-dbListConnections(MySQL()) for(con in cons) dbDisconnect(con)
   })
   observe({
     
