@@ -8,20 +8,28 @@ MySQL(max.con=100, fetch.default.rec=1000)
 #la funcion ubicacion establecimiento recibe como parametro txtregion que ...
 #contiene le numero de region seleccionado por el input regiones
 conn <- dbConnect(MySQL(), user="sigsge", host="localhost", password="WA0k7A27GKp70GSm", dbname="sigsge", port=3306)
-ubicacion_establecimiento <- function(txtregion) {
+ubicacion_establecimiento <- function(txtregion, txtcod_depe2) {
   
   #la consulta extra el RBD, Langitud y latitud de todos los establecimientos de la region 
-  my_query <- 'SELECT RBD, LATITUD, LONGITUD FROM ESTABLECIMIENTOS WHERE COD_REG_RBD = TXTREGION'
+
+  my_query <- 'SELECT RBD, LATITUD, LONGITUD, COD_DEPE2 FROM ESTABLECIMIENTOS WHERE COD_REG_RBD = TXTREGION AND COD_DEPE2 = TXTCOD_DEPE2'
   my_query <- sub("TXTREGION",txtregion,my_query)
+  my_query <- sub("TXTCOD_DEPE2",txtcod_depe2,my_query)
+  
+  
   ubicacion <- dbGetQuery(conn,my_query)
 }
 
 
-ubicacion_establecimiento_comuna <- function(txtcomuna) {
-  
+ubicacion_establecimiento_comuna <- function(txtcomuna, txtcod_depe2) {
+  #, txtcod_depe2
   #la consulta extra el RBD, Langitud y latitud de todos los establecimientos de la region 
-  my_query <- 'SELECT RBD, LATITUD, LONGITUD FROM ESTABLECIMIENTOS WHERE COD_COM_RBD = TXTCOMUNA'
+  #my_query <- 'SELECT RBD, LATITUD, LONGITUD, COD_DEPE2 FROM ESTABLECIMIENTOS WHERE COD_COM_RBD = TXTCOMUNA'
+  my_query <- 'SELECT RBD, LATITUD, LONGITUD, COD_DEPE2 FROM ESTABLECIMIENTOS WHERE COD_COM_RBD = TXTCOMUNA AND COD_DEPE2 = TXTCOD_DEPE2'
   my_query <- sub("TXTCOMUNA",txtcomuna,my_query)
+  my_query <- sub("TXTCOD_DEPE2",txtcod_depe2,my_query)
+  
+  
   ubicacion <- dbGetQuery(conn,my_query)
 }
 
@@ -33,7 +41,7 @@ shinyServer(function(input, output) {
   conn <- dbConnect(MySQL(), user="sigsge", host="localhost", password="WA0k7A27GKp70GSm", dbname="sigsge", port=3306)
   
   comunas <- function(txtregion) {
-    #la consulta extra el RBD, Langitud y latitud de todos los establecimientos de la comuna 
+    # 
     my_query <- 'SELECT NOM_COM, COD_COMUNA FROM COMUNAS WHERE COD_REG = TXTREGION'
     my_query <- sub("TXTREGION",txtregion,my_query)
     ubicacion <- dbGetQuery(conn,my_query)
@@ -173,10 +181,7 @@ shinyServer(function(input, output) {
     
     
     
-    
-    #   Se cargan los establecimientos de la region seleccionada
-    ubicacion_RBD <- as.character(ubicacion_establecimiento(input$txtregion)$RBD)
-    
+
     
     
     #Se carga la funcion leaflet con el argumento
@@ -190,10 +195,36 @@ shinyServer(function(input, output) {
         txtregion <-input$txtregion
         
         
-        leafletProxy("mimapa", data = ubicacion_establecimiento(txtregion)) %>%
+        leafletProxy("mimapa") %>%
           clearMarkers() %>%
-          addCircleMarkers(lat =  ~LATITUD, lng =  ~LONGITUD, weight = 6, radius = 3,color="#ffa500", stroke = TRUE, fillOpacity = 0.8, layerId = ~RBD
-          )
+        addCircleMarkers(lat =  ubicacion_establecimiento(txtregion,1)$LATITUD, lng =  ubicacion_establecimiento(txtregion,1)$LONGITUD, weight = 6, radius = 3,
+                         
+                         color = "#e52813"
+                         
+                         , stroke = TRUE, fillOpacity = 0.8, layerId = ubicacion_establecimiento(txtregion,1)$RBD
+        ) %>%
+          addCircleMarkers(lat =  ubicacion_establecimiento(txtregion,2)$LATITUD, lng =  ubicacion_establecimiento(txtregion,2)$LONGITUD, weight = 6, radius = 3,
+                           
+                           color = "#ead942"
+                           
+                           , stroke = TRUE, fillOpacity = 0.8, layerId = ubicacion_establecimiento(txtregion,2)$RBD
+          ) %>%          
+          addCircleMarkers(lat =  ubicacion_establecimiento(txtregion,3)$LATITUD, lng =  ubicacion_establecimiento(txtregion,3)$LONGITUD, weight = 6, radius = 3,
+                           
+                           color = "#61ab28"
+                           
+                           , stroke = TRUE, fillOpacity = 0.8, layerId = ubicacion_establecimiento(txtregion,3)$RBD
+          ) %>%          
+          addCircleMarkers(lat =  ubicacion_establecimiento(txtregion,4)$LATITUD, lng =  ubicacion_establecimiento(txtregion,4)$LONGITUD, weight = 6, radius = 3,
+                           
+                           color = "#74402b"
+                           
+                           , stroke = TRUE, fillOpacity = 0.8, layerId = ubicacion_establecimiento(txtregion,4)$RBD
+          )        
+        
+        
+        
+        
       } else {
         
         
@@ -204,10 +235,32 @@ shinyServer(function(input, output) {
           
        
         }
-        
-        leafletProxy("mimapa", data = ubicacion_establecimiento_comuna(txtcomuna)) %>%
+        #, data = ubicacion_establecimiento_comuna(txtcomuna)
+        leafletProxy("mimapa") %>%
           clearMarkers() %>%
-          addCircleMarkers(lat =  ~LATITUD, lng =  ~LONGITUD, weight = 6, radius = 3,color="#ffa500", stroke = TRUE, fillOpacity = 0.8, layerId = ~RBD
+          addCircleMarkers(lat =  ubicacion_establecimiento_comuna(txtcomuna,1)$LATITUD, lng =  ubicacion_establecimiento_comuna(txtcomuna,1)$LONGITUD, weight = 6, radius = 3,
+
+                             color = "#e52813"
+
+                           , stroke = TRUE, fillOpacity = 0.8, layerId = ubicacion_establecimiento_comuna(txtcomuna,1)$RBD
+          ) %>%
+          addCircleMarkers(lat =  ubicacion_establecimiento_comuna(txtcomuna,2)$LATITUD, lng =  ubicacion_establecimiento_comuna(txtcomuna,2)$LONGITUD, weight = 6, radius = 3,
+                           
+                           color = "#ead942"
+                           
+                           , stroke = TRUE, fillOpacity = 0.8, layerId = ubicacion_establecimiento_comuna(txtcomuna,2)$RBD
+          ) %>%
+          addCircleMarkers(lat =  ubicacion_establecimiento_comuna(txtcomuna,3)$LATITUD, lng =  ubicacion_establecimiento_comuna(txtcomuna,3)$LONGITUD, weight = 6, radius = 3,
+                           
+                           color = "#61ab28"
+                           
+                           , stroke = TRUE, fillOpacity = 0.8, layerId = ubicacion_establecimiento_comuna(txtcomuna,3)$RBD
+          ) %>%
+          addCircleMarkers(lat =  ubicacion_establecimiento_comuna(txtcomuna,4)$LATITUD, lng =  ubicacion_establecimiento_comuna(txtcomuna,4)$LONGITUD, weight = 6, radius = 3,
+                           
+                           color = "#74402b"
+                           
+                           , stroke = TRUE, fillOpacity = 0.8, layerId = ubicacion_establecimiento_comuna(txtcomuna,4)$RBD
           )
       }
       
@@ -233,14 +286,14 @@ shinyServer(function(input, output) {
   
   states <- readOGR("www/division_comunal/division_comunal.shp",
                     layer = "division_comunal", GDAL1_integer64_policy = TRUE)
-  
+  states <- spTransform(states, CRS("+ellps=GRS80 +proj=longlat"))
   neStates <- subset(states, states$COD_COMUNA %in% c(
-    "9112"
+    "9101"
   ))
   
   leaflet(neStates) %>%
-    addPolygons(color = "#444444", weight = 3, smoothFactor = 0.5,
-                opacity = 1.0, fillOpacity = 0.5
+    addPolygons(color = "#000000", weight = 3, smoothFactor = 0.5,
+                opacity = 0.5, fillOpacity = 0.5
     )
   
   
