@@ -132,7 +132,7 @@ shinyServer(function(input, output) {
   matricula_establecimiento <- function(RBD_establecimiento_seleccionado) {
     conn <- dbConnect(MySQL(), user="sigsge", host="localhost", password="WA0k7A27GKp70GSm", dbname="sigsge", port=3306)
     
-    my_query <- 'SELECT count(*) FROM ALUMNOS WHERE AGNO = AÑO_SELECCIONADO AND RBD = RBD_SELECCIONADO'
+    my_query <- 'SELECT ALUM_MAT FROM CANT_ALUM WHERE AGNO = AÑO_SELECCIONADO AND RBD = RBD_SELECCIONADO'
     my_query <- sub("AÑO_SELECCIONADO",input$AGNO,my_query)
     my_query <- sub("RBD_SELECCIONADO",RBD_establecimiento_seleccionado,my_query)
     matricula <- dbGetQuery(conn,my_query)
