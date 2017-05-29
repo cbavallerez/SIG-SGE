@@ -86,13 +86,23 @@ shinyServer(function(input, output) {
       tags$p("Nombre: ",establecimiento_seleccionado(RBD_establecimiento_seleccionado)$NOM_RBD),
       tags$p("Longitud: ",establecimiento_seleccionado(RBD_establecimiento_seleccionado)$LONGITUD),
       tags$p("Latitud: ",establecimiento_seleccionado(RBD_establecimiento_seleccionado)$LATITUD),
-      tags$p("Matricula: ",matricula_establecimiento(RBD_establecimiento_seleccionado)),
       tags$p("Comuna: ",establecimiento_seleccionado(RBD_establecimiento_seleccionado)$NOM_COM_RBD),
+      tags$p("Matricula: ",matricula_establecimiento(RBD_establecimiento_seleccionado)),
       tags$p("Cantidad de Alumnos SEP en la escuela: ",sep_establecimiento(RBD_establecimiento_seleccionado)),
-      tags$p("pi -> Proporcion SEP/ESC: ",matricula_establecimiento(RBD_establecimiento_seleccionado)),
-      tags$p("Indice Seg: ",matricula_establecimiento(RBD_establecimiento_seleccionado))
+      tags$p("Estudiantes no sep: ",matricula_establecimiento(RBD_establecimiento_seleccionado)-sep_establecimiento(RBD_establecimiento_seleccionado)),
+      tags$p("N° de Estudiantes en la comuna: ",estudiantes_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD)),
+      tags$p("N° de Estudiantes SEP en la comuna: ",estudiantes_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD)-estudiantes_sep_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD)),
+      tags$p("N° de Estudiantes NO SEP en la comuna: ",estudiantes_sep_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD))
       
       
+     
+      ### P: number of poor students in comuna
+      ### NP: number of non-poor students in comuna
+      ### Calculations:
+      ### n: total number of students in school
+      ### N: total number of students in comuna
+      ### p: number of poor students in school
+      ### np: number of non-poor students in school
       
     )
   })
@@ -127,6 +137,28 @@ shinyServer(function(input, output) {
     
   }
   
+  estudiantes_sep_comuna <- function(COM_seleccionado) {
+    conn <- dbConnect(MySQL(), user="sigsge", host="localhost", password="WA0k7A27GKp70GSm", dbname="sigsge", port=3306)
+    
+    my_query <- 'SELECT CANT_ALUM_SEP FROM COM_ALUM_SEP WHERE AGNO = AÑO_SELECCIONADO AND COD_COM = COM_SELECCIONADO'
+    my_query <- sub("AÑO_SELECCIONADO",input$AGNO,my_query)
+    my_query <- sub("COM_SELECCIONADO",COM_seleccionado,my_query)
+    matricula <- dbGetQuery(conn,my_query)
+    #cons<-dbListConnections(MySQL()) for(con in cons) dbDisconnect(con)
+    
+  }
+  
+  estudiantes_comuna <- function(COM_seleccionado) {
+    conn <- dbConnect(MySQL(), user="sigsge", host="localhost", password="WA0k7A27GKp70GSm", dbname="sigsge", port=3306)
+    
+    my_query <- 'SELECT CANT_ALUM_COM FROM COM_ALUM WHERE AGNO = AÑO_SELECCIONADO AND COD_COM = COM_SELECCIONADO'
+    my_query <- sub("AÑO_SELECCIONADO",input$AGNO,my_query)
+    my_query <- sub("COM_SELECCIONADO",COM_seleccionado,my_query)
+    matricula <- dbGetQuery(conn,my_query)
+    #cons<-dbListConnections(MySQL()) for(con in cons) dbDisconnect(con)
+    
+  }
+  
   #Esta funciona recibe el RBD del establecimiento para almacenar el conteo de alumnos inscritos en ese establecimiento   
   
   matricula_establecimiento <- function(RBD_establecimiento_seleccionado) {
@@ -144,7 +176,7 @@ shinyServer(function(input, output) {
   sep_establecimiento <- function(RBD_establecimiento_seleccionado) {
     conn <- dbConnect(MySQL(), user="sigsge", host="localhost", password="WA0k7A27GKp70GSm", dbname="sigsge", port=3306)
     on.exit(DBI::dbDisconnect(conn))
-    my_query <- 'SELECT count(*) FROM ALUMNOS_SEP WHERE AGNO = AÑO_SELECCIONADO AND RBD = RBD_SELECCIONADO'
+    my_query <- 'SELECT CANT_ALUM_SEP FROM TEMP_SEP WHERE AGNO = AÑO_SELECCIONADO AND RBD = RBD_SELECCIONADO'
     my_query <- sub("AÑO_SELECCIONADO",input$AGNO,my_query)
     my_query <- sub("RBD_SELECCIONADO",RBD_establecimiento_seleccionado,my_query)
     ubicacion <- dbGetQuery(conn,my_query)
