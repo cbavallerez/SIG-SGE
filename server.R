@@ -64,7 +64,7 @@ shinyServer(function(input, output) {
   })
   #En la siguiente salida se envia a la UI.R un input del tipo numerico que servira pa seleecionar un establecimiento 
   output$inputRBD = renderUI({
-    numericInput("establecimiento_seleccionado", "RBD:",  9101)
+    numericInput("establecimiento_seleccionado", "RBD:",  5578)
   })
   output$salida_ver_shapefile<-renderPrint({
     if (input$estab_for_region == FALSE) {
