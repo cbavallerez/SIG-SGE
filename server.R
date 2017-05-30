@@ -4,7 +4,7 @@ library(DBI)
 library(htmltools)
 library(rgdal)
 library(dbConnect)
-MySQL(max.con=100, fetch.default.rec=1000)
+MySQL(max.con=1000, fetch.default.rec=1000)
 #la funcion ubicacion establecimiento recibe como parametro txtregion que ...
 #contiene le numero de region seleccionado por el input regiones
 conn <- dbConnect(MySQL(), user="sigsge", host="localhost", password="WA0k7A27GKp70GSm", dbname="sigsge", port=3306)
