@@ -82,7 +82,20 @@ body <- dashboardBody(
                ,
                checkboxInput("ver_shapefile", "Ver division comunal", FALSE),
                verbatimTextOutput("salida_ver_shapefile")
+           ),
+           box(width = NULL, status = "warning",
+               tags$ul(
+                 tags$div(`class` = "colores tipo1"),
+                 tags$li("Municipal"), 
+                 tags$div(`class` = "colores tipo2"),
+                 tags$li("Particular Subvenciando"),
+                 tags$div(`class` = "colores tipo3"),
+                 tags$li("Particular Pagado"), 
+                 tags$div(`class` = "colores tipo4"),
+                 tags$li("Corp. de Administracion delegada")
+               )
            )
+
 
       
     )

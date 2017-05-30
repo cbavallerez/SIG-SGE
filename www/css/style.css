@@ -1,3 +1,34 @@
 p{
 color: white;
 }
+
+.colores{
+    height: 10px;
+    width: 10px;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+li {
+  list-style-type: none;
+}
+
+.tipo1{
+  background-color:#e52813
+}
+
+.tipo2{
+  background-color:#ead942
+}
+
+.tipo3{
+  background-color:#61ab28
+}
+
+.tipo4{
+  background-color:#74402b
+}
