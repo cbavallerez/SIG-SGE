@@ -42,7 +42,7 @@ shinyServer(function(input, output) {
   
   comunas <- function(txtregion) {
     # 
-    my_query <- 'SELECT NOM_COM, COD_COMUNA FROM COMUNAS WHERE COD_REG = TXTREGION'
+    my_query <- 'SELECT NOM_COM, COD_COM FROM COMUNAS WHERE COD_REG = TXTREGION'
     my_query <- sub("TXTREGION",txtregion,my_query)
     ubicacion <- dbGetQuery(conn,my_query)
   }
@@ -109,7 +109,7 @@ shinyServer(function(input, output) {
   #En la siguiente salida se crea un select para las comunas
   output$seleccionar_comuna = renderUI({
     RBD_establecimiento_seleccionado <- as.numeric(input$establecimiento_seleccionado) 
-    choicesComunas <- setNames(as.character(comunas(input$txtregion)$COD_COMUNA), comunas(input$txtregion)$NOM_COM)
+    choicesComunas <- setNames(as.character(comunas(input$txtregion)$COD_COM), comunas(input$txtregion)$NOM_COM)
     selectInput("txtcomuna", label = h4("Seleccionar Comuna"), choices = choicesComunas, selected = as.numeric(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD) 
     )
     
