@@ -38,6 +38,30 @@ ubicacion_establecimiento_comuna <- function(txtcomuna, txtcod_depe2) {
 
 
 shinyServer(function(input, output) {
+  S<-function(p,np,P,NP){
+    ### p: number of poor students in school
+    ### np: number of non-poor students in school
+    ### P: number of poor students in comuna
+    ### NP: number of non-poor students in comuna
+    ### Calculations:
+    ### n: total number of students in school
+    ### N: total number of students in comuna
+    
+    n<-p+np
+    N<-P+NP
+    p<-p/n
+    np<-np/n
+    P<-P/N
+    NP<-NP/N
+    if(P==0 && p==0 || P==1 && p==1){
+      return(0)
+    }
+    if(P==1 && p==0 || P==0 && p==1){
+      return(1)
+    }
+    return(abs(exp(-p/P)-exp(-np/NP)))
+  }
+  
   conn <- dbConnect(MySQL(), user="sigsge", host="localhost", password="WA0k7A27GKp70GSm", dbname="sigsge", port=3306)
   
   comunas <- function(txtregion) {
@@ -92,7 +116,9 @@ shinyServer(function(input, output) {
       tags$p("Estudiantes no sep: ",matricula_establecimiento(RBD_establecimiento_seleccionado)-sep_establecimiento(RBD_establecimiento_seleccionado)),
       tags$p("N° de Estudiantes en la comuna: ",estudiantes_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD)),
       tags$p("N° de Estudiantes SEP en la comuna: ",estudiantes_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD)-estudiantes_sep_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD)),
-      tags$p("N° de Estudiantes NO SEP en la comuna: ",estudiantes_sep_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD))
+      tags$p("N° de Estudiantes NO SEP en la comuna: ",estudiantes_sep_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD)),
+      tags$p("Indice de segregacion: ",S(sep_establecimiento(RBD_establecimiento_seleccionado),matricula_establecimiento(RBD_establecimiento_seleccionado)-sep_establecimiento(RBD_establecimiento_seleccionado),estudiantes_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD)-estudiantes_sep_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD),estudiantes_sep_comuna(establecimiento_seleccionado(RBD_establecimiento_seleccionado)$COD_COM_RBD)))
+      
       
       
      
@@ -157,6 +183,7 @@ shinyServer(function(input, output) {
     matricula <- dbGetQuery(conn,my_query)
     #cons<-dbListConnections(MySQL()) for(con in cons) dbDisconnect(con)
     
+    
   }
   
   #Esta funciona recibe el RBD del establecimiento para almacenar el conteo de alumnos inscritos en ese establecimiento   
@@ -199,7 +226,7 @@ shinyServer(function(input, output) {
   
   #  Se declara la salida mimapa almacenando un renderleaflet
   output$mimapa <- renderLeaflet({ 
-    
+
     
     #Se inicia la conexion con la base de datos
     conn <- dbConnect(MySQL(), user="sigsge", host="localhost", password="WA0k7A27GKp70GSm", dbname="sigsge", port=3306)
